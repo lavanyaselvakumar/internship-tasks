@@ -1,0 +1,70 @@
+Internship Task - Day 2
+Today’s goals:
+ ✅ Learn about file-based routing system
+ ✅ Create multiple pages (Home, About, Product)
+ ✅ Implement dynamic routes in Next.js
+ ✅ Navigate between pages using Link
+
+Next.js uses a powerful feature called the "File-Based Routing System." This means that the structure of the files and folders in your app directly defines the routes (URLs) of your website.
+This removes the need to manually configure routes like in React Router.
+📁 How It Works
+ The app/ or pages/ directory in your Next.js project defines the route structure.
+ Each file (like page.tsx or page.js) inside app/ becomes a route.
+ Folders define URL paths, and files define what is rendered on that route.
+
+1️⃣ Home Page → app/page.tsx
+import Link from 'next/link';
+export default function HomePage() {
+  return (
+    <main style={{ padding: '2rem' }}>
+      <h1>🏠 Home Page</h1>
+      <p>Welcome to my Next.js app</p>
+      <ul>
+        <li><Link href="/about">Go to About Page</Link></li>
+        <li><Link href="/product/101">Go to Product ID 101</Link></li>
+        <li><Link href="/product/202">Go to Product ID 202</Link></li>
+      </ul>
+    </main>
+  );
+}
+
+2️⃣ About Page → app/about/page.tsx
+export default function AboutPage() {
+  return (
+    <main style={{ padding: '2rem' }}>
+      <h1>📘 About Page</h1>
+      <p>This is the About page of the application.</p>
+      <a href="/">← Back to Home</a>
+    </main>
+  );
+}
+
+3️⃣ Dynamic Product Page → app/product/[id]/page.tsx
+'use client';
+import { useParams } from 'next/navigation';
+export default function ProductPage() {
+  const params = useParams();
+  const id = params.id;
+  return (
+    <main style={{ padding: '2rem' }}>
+      <h1>📦 Product Page</h1>
+      <p>Showing product details for ID: {id}</p>
+      <a href="/">← Back to Home</a>
+    </main>
+  );
+}
+🔁 Navigation Flow
+ Visit / → Home Page
+ Click About → Navigates to /about
+ Click Product → Navigates to /product/101 (or any ID)
+ All pages have “Back to Home” link
+
+💻 Run the Project
+ Start development server:
+ npm run dev
+ Open browser at:
+ http://localhost:3000
+
+
+
+
