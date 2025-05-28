@@ -1,0 +1,29 @@
+Day 1 – Setup & Introduction to Next.js
+  Today marked the official start of my internship, and the focus was entirely on setting up the development environment and getting acquainted with Next.js. I successfully completed the initial setup and created my very first Next.js project.
+1. Installed Node.js and Development Tools
+   To begin, I installed Node.js, which is essential for running JavaScript outside of a browser and for managing project dependencies. Along with Node.js, I ensured I had the necessary development tools in place, such as a code editor (VS Code is my preference) and a terminal. This foundational step is crucial for any modern web development workflow.
+   Downloaded and installed Node.js LTS version from https://nodejs.org
+   Verified installation using:
+   node -v
+   npm -v
+   Installed Visual Studio Code as the code editor
+2. Created First Next.js Project Using create-next-app
+   With Node.js in place, I used the create-next-app command-line tool to bootstrap my first Next.js project. This command automatically sets up a new Next.js application with a pre-configured structure, allowing for a quick and efficient start. It's an incredibly useful tool that saves a lot of initial setup time.
+   Used npx to create a new project:
+   npx create-next-app@latest my-next-app
+   Navigated into the project folder:
+   cd my-next-app
+   Started the development server:
+   npm run dev
+   Opened the app at http://localhost:3000
+3. Understood Project Structure & Configuration Files
+   After creating the project, I spent time exploring the generated file structure. I familiarized myself with key directories like pages, public, and styles, and understood their roles in a Next.js application. I also looked into important configuration files such as package.json (for project dependencies and scripts) and next.config.js (for customizing Next.js behavior). Gaining this understanding early on is vital for efficient development and debugging.
+   Key Folders and Files:
+   Folder/File	Purpose
+   app/	Contains pages and routes (App Router)
+   public/	Stores static assets like images
+   styles/	Contains CSS files
+   package.json	Project metadata and dependencies
+   next.config.js	Next.js configuration
+   tsconfig.json	TypeScript configuration (if selected)
+   .gitignore	Git ignore rules
