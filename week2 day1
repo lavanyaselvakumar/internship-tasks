@@ -1,0 +1,126 @@
+blog-website/
+├── app/
+│   ├── about/
+│   │   └── page.js
+│   ├── blog/
+│   │   └── page.js
+│   ├── contact/
+│   │   └── page.js
+│   ├── page.js
+│   └── layout.js
+├── components/
+│   └── Navbar.js
+├── public/
+├── styles/
+│   └── globals.css
+├── tailwind.config.js
+├── postcss.config.js
+├── package.json
+
+tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./app/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
+postcss.config.js
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+styles/globals.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: sans-serif;
+}
+
+app/layout.js
+import '../styles/globals.css'
+import Navbar from '@/components/Navbar'
+
+export const metadata = {
+  title: 'Blog Website',
+  description: 'Created with Next.js and Tailwind CSS',
+}
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        <Navbar />
+        <main className="max-w-4xl mx-auto p-4">
+          {children}
+        </main>
+      </body>
+    </html>
+  )
+}
+
+components/Navbar.js
+'use client'
+import Link from 'next/link'
+
+export default function Navbar() {
+  return (
+    <nav className="bg-blue-800 text-white px-6 py-4 flex space-x-4">
+      <Link href="/" className="hover:underline">Home</Link>
+      <Link href="/about" className="hover:underline">About</Link>
+      <Link href="/blog" className="hover:underline">Blog</Link>
+      <Link href="/contact" className="hover:underline">Contact</Link>
+    </nav>
+  )
+}
+
+app/page.js
+export default function Home() {
+  return (
+    <div className="p-6 text-xl">
+      <h1 className="text-3xl font-bold mb-4">Welcome to My Blog</h1>
+      <p>This is the home page of the blog.</p>
+    </div>
+  )
+}
+
+app/about/page.js
+export default function About() {
+  return (
+    <div className="p-6 text-xl">
+      <h1 className="text-3xl font-bold mb-4">About Me</h1>
+      <p>This is the About page of my blog website.</p>
+    </div>
+  )
+}
+
+app/blog/page.js
+export default function Blog() {
+  return (
+    <div className="p-6 text-xl">
+      <h1 className="text-3xl font-bold mb-4">Blog Posts</h1>
+      <p>Blog posts will be listed here soon.</p>
+    </div>
+  )
+}
+
+app/contact/page.js
+export default function Contact() {
+  return (
+    <div className="p-6 text-xl">
+      <h1 className="text-3xl font-bold mb-4">Contact Me</h1>
+      <p>Email: blog@example.com</p>
+    </div>
+  )
+}
+
