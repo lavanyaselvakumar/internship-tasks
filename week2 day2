@@ -1,0 +1,128 @@
+blog-website/
+├── app/
+│   ├── layout.js
+│   ├── page.js
+│   ├── about/page.js
+│   ├── blog/page.js
+│   ├── contact/page.js
+├── components/
+│   ├── Header.js        NEW
+│   ├── Footer.js        NEW
+│   ├── Layout.js        NEW
+│   └── Navbar.js
+├── styles/globals.css
+
+components/Header.js
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
+const Header = () => {
+  const router = useRouter();
+
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'About Us', path: '/about' },
+    { name: 'Services', path: '/services' },
+    { name: 'Contact', path: '/contact' },
+  ];
+
+  return (
+    <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 shadow-lg">
+      <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
+        <Link href="/" className="text-2xl font-bold mb-4 md:mb-0 hover:text-blue-200 transition-colors duration-200">
+          My Company
+        </Link>
+        <nav>
+          <ul className="flex flex-wrap justify-center md:space-x-8 space-x-4">
+            {navLinks.map((link) => (
+              <li key={link.name} className="mb-2 md:mb-0">
+                <Link
+                  href={link.path}
+                  className={`
+                    text-white hover:text-blue-300 transition-colors duration-200
+                    ${router.pathname === link.path ? 'text-blue-200 font-semibold border-b-2 border-blue-200' : ''}
+                    px-3 py-2 rounded-md
+                  `}
+                >
+                  {link.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
+
+components/Footer.js
+const Footer = () => {
+  return (
+    <footer className="bg-gray-800 text-gray-300 p-6 text-center border-t border-gray-700 mt-12">
+      <p>&copy; {new Date().getFullYear()} My Company. All rights reserved.</p>
+    </footer>
+  );
+};
+
+export default Footer;
+
+components/Navbar.js (updated with useRouter for active menu)
+'use client'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+
+export default function Navbar() {
+  const router = useRouter()
+  const pathname = router?.pathname || '' // fallback just in case
+
+  const linkClass = (path) =>
+    `hover:underline ${pathname === path ? 'text-yellow-300 font-bold' : ''}`
+
+  return (
+    <nav className="bg-blue-800 text-white px-6 py-4 flex space-x-6">
+      <Link href="/" className={linkClass('/')}>Home</Link>
+      <Link href="/about" className={linkClass('/about')}>About</Link>
+      <Link href="/blog" className={linkClass('/blog')}>Blog</Link>
+      <Link href="/contact" className={linkClass('/contact')}>Contact</Link>
+    </nav>
+  )
+}
+
+components/Layout.js (Reusable Layout Wrapper)
+'use client'
+import Header from './Header'
+import Navbar from './Navbar'
+import Footer from './Footer'
+
+export default function Layout({ children }) {
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <Navbar />
+      <main className="flex-grow max-w-4xl mx-auto p-4">{children}</main>
+      <Footer />
+    </div>
+  );
+}
+
+app/layout.js
+import '../styles/globals.css'
+import Layout from '@/components/Layout'
+
+export const metadata = {
+  title: 'Blog Website',
+  description: 'Created with Next.js and Tailwind CSS',
+}
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        <Layout>{children}</Layout>
+      </body>
+    </html>
+  )
+}
+
