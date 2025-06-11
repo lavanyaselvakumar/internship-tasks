@@ -1,0 +1,184 @@
+/app
+  /about
+    page.js
+  /blog
+    /[slug]
+      page.js
+    page.js
+  layout.js
+  page.js
+/public
+  /images
+    blog1.jpg
+    blog2.jpg
+/components
+  Header.js
+  Footer.js
+  PostCard.js
+next.config.js
+tailwind.config.js
+README.md
+
+next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    domains: ['images.unsplash.com'], // allow external images if used
+  },
+};
+
+module.exports = nextConfig;
+
+app/layout.js
+import './globals.css';
+import { Inter } from 'next/font/google';
+import Head from 'next/head';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata = {
+  title: 'My Blog',
+  description: 'A personal blog built with Next.js',
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+      <body className={inter.className}>
+        <Header />
+        <main className="min-h-screen p-4">{children}</main>
+        <Footer />
+      </body>
+    </html>
+  );
+}
+
+app/page.js (Home Page)
+'use client';
+import Head from 'next/head';
+
+export default function HomePage() {
+  return (
+    <>
+      <Head>
+        <title>Home | My Blog</title>
+        <meta name="description" content="Home page of my Next.js blog" />
+      </Head>
+      <section>
+        <h1 className="text-3xl font-bold">Welcome to My Blog</h1>
+        <p className="mt-2 text-gray-600">Explore articles on tech, coding, and more.</p>
+      </section>
+    </>
+  );
+}
+
+app/about/page.js
+'use client';
+import Head from 'next/head';
+
+export default function AboutPage() {
+  return (
+    <>
+      <Head>
+        <title>About | My Blog</title>
+        <meta name="description" content="Learn more about the author of this blog." />
+      </Head>
+      <div>
+        <h1 className="text-3xl font-semibold">About Me</h1>
+        <p className="mt-2 text-gray-600">I write about programming and development.</p>
+      </div>
+    </>
+  );
+}
+
+app/blog/page.js
+import PostCard from '@/components/PostCard';
+
+const posts = [
+  {
+    title: 'Getting Started with Next.js',
+    description: 'An intro guide to Next.js development.',
+    slug: 'getting-started',
+    imageUrl: '/images/blog1.jpg',
+  },
+  {
+    title: 'Tailwind Tips & Tricks',
+    description: 'Improve your Tailwind CSS skills.',
+    slug: 'tailwind-tips',
+    imageUrl: '/images/blog2.jpg',
+  },
+];
+
+export default function BlogPage() {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold mb-4">Blog Posts</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {posts.map(post => (
+          <PostCard key={post.slug} post={post} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+app/blog/[slug]/page.js
+export default function BlogPostPage({ params }) {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold">Post: {params.slug}</h1>
+      <p className="mt-2 text-gray-600">Detailed content coming soon...</p>
+    </div>
+  );
+}
+
+ components/PostCard.js
+import Link from 'next/link';
+import Image from 'next/image';
+
+export default function PostCard({ post }) {
+  return (
+    <div className="rounded-lg border shadow hover:shadow-md transition p-4">
+      <Link href={`/blog/${post.slug}`}>
+        <Image
+          src={post.imageUrl}
+          alt={post.title}
+          width={600}
+          height={400}
+          className="rounded mb-3 object-cover"
+        />
+      </Link>
+      <h2 className="text-xl font-semibold">{post.title}</h2>
+      <p className="text-gray-600">{post.description}</p>
+    </div>
+  );
+}
+
+components/Header.js
+import Link from 'next/link';
+
+export default function Header() {
+  return (
+    <header className="bg-gray-800 text-white p-4">
+      <nav className="flex gap-4">
+        <Link href="/" className="hover:underline">Home</Link>
+        <Link href="/about" className="hover:underline">About</Link>
+        <Link href="/blog" className="hover:underline">Blog</Link>
+      </nav>
+    </header>
+  );
+}
+
+components/Footer.js
+export default function Footer() {
+  return (
+    <footer className="bg-gray-200 text-center p-4 mt-8 text-sm text-gray-600">
+      © {new Date().getFullYear()} My Blog. All rights reserved.
+    </footer>
+  );
+}
