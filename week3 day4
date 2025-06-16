@@ -1,0 +1,177 @@
+├── components/
+│   ├── BlogCard.tsx
+│   ├── SkeletonCard.tsx
+│   ├── LoadingSkeleton.tsx
+│   └── Layout.tsx
+├── pages/
+│   ├── index.tsx
+│   ├── blog.tsx
+│   └── _app.tsx
+├── variants/
+│   └── animations.ts
+├── data/
+│   └── blogData.json
+
+variants/animations.ts
+// variants/animations.ts
+export const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: 'easeOut' },
+  },
+}
+
+export const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+}
+
+export const cardHover = {
+  hover: {
+    scale: 1.03,
+    boxShadow: '0px 10px 20px rgba(0,0,0,0.1)',
+    transition: { duration: 0.3 },
+  },
+  tap: { scale: 0.97 },
+}
+
+components/BlogCard.tsx
+import { motion } from 'framer-motion'
+import { cardHover, fadeInUp } from '@/variants/animations'
+
+export default function BlogCard({ title, description }: { title: string; description: string }) {
+  return (
+    <motion.div
+      className="bg-white p-6 rounded-xl shadow-md border"
+      variants={fadeInUp}
+      whileHover="hover"
+      whileTap="tap"
+      variants={cardHover}
+    >
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <p className="text-gray-600">{description}</p>
+    </motion.div>
+  )
+}
+
+components/LoadingSkeleton.tsx
+// Skeleton wrapper
+import SkeletonCard from './SkeletonCard'
+
+export default function LoadingSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 py-8">
+      {[...Array(4)].map((_, i) => (
+        <SkeletonCard key={i} />
+      ))}
+    </div>
+  )
+}
+
+components/SkeletonCard.tsx
+export default function SkeletonCard() {
+  return (
+    <div className="animate-pulse bg-white border rounded-xl shadow-sm p-6 space-y-4">
+      <div className="h-5 w-2/3 bg-gray-300 rounded"></div>
+      <div className="h-4 w-full bg-gray-200 rounded"></div>
+      <div className="h-4 w-5/6 bg-gray-200 rounded"></div>
+    </div>
+  )
+}
+
+pages/blog.tsx
+import { useEffect, useState } from 'react'
+import BlogCard from '@/components/BlogCard'
+import LoadingSkeleton from '@/components/LoadingSkeleton'
+import { motion } from 'framer-motion'
+import { staggerContainer } from '@/variants/animations'
+
+type Blog = {
+  id: number
+  title: string
+  description: string
+}
+
+export default function BlogPage() {
+  const [blogs, setBlogs] = useState<Blog[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setTimeout(() => {
+      fetch('/data/blogData.json')
+        .then((res) => res.json())
+        .then((data) => {
+          setBlogs(data)
+          setLoading(false)
+        })
+    }, 1500)
+  }, [])
+
+  if (loading) return <LoadingSkeleton />
+
+  return (
+    <motion.div
+      className="container mx-auto px-4 py-8 grid gap-6 md:grid-cols-2"
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+    >
+      {blogs.map((blog) => (
+        <BlogCard key={blog.id} title={blog.title} description={blog.description} />
+      ))}
+    </motion.div>
+  )
+}
+
+pages/_app.tsx
+import '@/styles/globals.css'
+import type { AppProps } from 'next/app'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useRouter } from 'next/router'
+
+export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter()
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={router.route}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Component {...pageProps} />
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+blogData.json
+[
+  {
+    "id": 1,
+    "title": "Building a Next.js Blog",
+    "description": "Learn how to create a blog site using Next.js and Tailwind CSS."
+  },
+  {
+    "id": 2,
+    "title": "Framer Motion Magic",
+    "description": "Add delightful animations to your UI with Framer Motion."
+  },
+  {
+    "id": 3,
+    "title": "SEO Tips for Developers",
+    "description": "Boost your site's discoverability using proper SEO techniques."
+  },
+  {
+    "id": 4,
+    "title": "Deploy to Vercel",
+    "description": "Learn how to easily deploy your Next.js app using Vercel."
+  }
+]
