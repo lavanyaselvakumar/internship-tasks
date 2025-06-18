@@ -1,0 +1,194 @@
+my-project-root
+├── components
+│   └── AuthForm.tsx
+├── lib
+│   └── users.ts             
+├──pages
+│   ├── api
+│   │   └── auth
+│   │       └── [...nextauth].ts
+│   ├── dashboard.tsx
+│   ├── index.tsx            
+│   ├── signup.tsx            
+│   └── _app.tsx
+├── styles
+│   └── globals.css
+└── .env.local
+
+lib/users.ts
+export const mockUsers = [
+  {
+    id: '1',
+    name: 'Test User',
+    email: 'test@example.com',
+    password: 'password',
+  },
+];
+
+pages/api/auth/[...nextauth].ts
+import NextAuth from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { mockUsers } from '@/lib/users';
+
+const handler = NextAuth({
+  providers: [
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        const user = mockUsers.find(
+          (u) => u.email === credentials?.email && u.password === credentials?.password
+        );
+
+        if (user) return user;
+        return null;
+      },
+    }),
+  ],
+  pages: {
+    signIn: '/',
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+});
+
+export { handler as GET, handler as POST };
+
+components/AuthForm.tsx
+'use client';
+
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/router';
+
+export default function AuthForm({ isSignup = false }: { isSignup?: boolean }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    if (isSignup) {
+      alert("Signup is UI-only in this mock. Please login with test@example.com / password");
+      router.push('/');
+      return;
+    }
+
+    const res = await signIn('credentials', {
+      redirect: false,
+      email,
+      password,
+    });
+
+    if (res?.ok) {
+      router.push('/dashboard');
+    } else {
+      setError('Invalid email or password');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 mt-20 bg-white shadow rounded">
+      <h2 className="text-2xl font-bold mb-4">{isSignup ? 'Signup' : 'Login'}</h2>
+      {error && <p className="text-red-600 mb-2">{error}</p>}
+      <input
+        type="email"
+        placeholder="Email"
+        className="w-full border p-2 mb-4"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        className="w-full border p-2 mb-4"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded w-full">
+        {isSignup ? 'Signup' : 'Login'}
+      </button>
+      <div className="mt-4 text-sm text-center">
+        {isSignup ? (
+          <p>
+            Already have an account?{' '}
+            <a href="/" className="text-blue-500 underline">Login</a>
+          </p>
+        ) : (
+          <p>
+            New user?{' '}
+            <a href="/signup" className="text-blue-500 underline">Signup</a>
+          </p>
+        )}
+      </div>
+    </form>
+  );
+}
+
+pages/index.tsx 
+import AuthForm from '@/components/AuthForm';
+
+export default function LoginPage() {
+  return (
+    <main className="min-h-screen bg-gray-100 flex justify-center items-center">
+      <AuthForm />
+    </main>
+  );
+}
+
+pages/signup.tsx
+import AuthForm from '@/components/AuthForm';
+
+export default function SignupPage() {
+  return (
+    <main className="min-h-screen bg-gray-100 flex justify-center items-center">
+      <AuthForm isSignup />
+    </main>
+  );
+}
+
+pages/dashboard.tsx
+import { getSession, useSession, signOut } from 'next-auth/react';
+import { GetServerSideProps } from 'next';
+
+export default function Dashboard() {
+  const { data: session } = useSession();
+
+  return (
+    <div className="p-10">
+      <h1 className="text-2xl font-bold">Welcome, {session?.user?.email}</h1>
+      <p className="mt-2 text-gray-600">You have access to this protected page.</p>
+      <button
+        onClick={() => signOut()}
+        className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+      >
+        Logout
+      </button>
+    </div>
+  );
+}
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession(context);
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: { session },
+  };
+};
+
+
