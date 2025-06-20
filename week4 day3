@@ -1,0 +1,164 @@
+app
+  layout.js
+  page.js
+  dashboard.js
+context
+  ThemeContext.js
+  AuthContext.js
+components
+  ThemeToggle.js
+  LoginToggle.js
+  Header.js
+styles
+  globals.css
+
+context/ThemeContext.js
+'use client'
+import { createContext, useContext, useState, useEffect } from 'react';
+
+const ThemeContext = createContext();
+
+export const ThemeProvider = ({ children }) => {
+  const [theme, setTheme] = useState('light');
+
+  useEffect(() => {
+    document.documentElement.className = theme;
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+export const useTheme = () => useContext(ThemeContext);
+
+context/AuthContext.js
+'use client'
+import { createContext, useContext, useState } from 'react';
+
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const login = () => setIsLoggedIn(true);
+  const logout = () => setIsLoggedIn(false);
+
+  return (
+    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);
+
+app/layout.js
+import './globals.css'
+import { ThemeProvider } from '@/context/ThemeContext';
+import { AuthProvider } from '@/context/AuthContext';
+
+export const metadata = {
+  title: 'Global State Demo',
+  description: 'Using Context API in Next.js App Router',
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body className="transition-all bg-white dark:bg-gray-900 text-black dark:text-white">
+        <AuthProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
+
+app/page.js
+import Header from '@/components/Header';
+
+export default function Home() {
+  return (
+    <main className="p-6">
+      <Header />
+      <h1 className="text-2xl font-bold mb-4">Welcome to Home Page</h1>
+    </main>
+  );
+}
+
+app/dashboard.js
+'use client'
+import { useAuth } from '@/context/AuthContext';
+
+export default function Dashboard() {
+  const { isLoggedIn } = useAuth();
+
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <p className="mt-4">
+        {isLoggedIn ? 'You are logged in!' : 'You must log in to see the dashboard.'}
+      </p>
+    </div>
+  );
+}
+
+components/Header.js
+import ThemeToggle from './ThemeToggle';
+import LoginToggle from './LoginToggle';
+
+export default function Header() {
+  return (
+    <header className="flex items-center justify-between py-4 px-6 bg-gray-100 dark:bg-gray-800 shadow mb-6">
+      <h2 className="text-xl font-semibold">My App</h2>
+      <div className="flex gap-4">
+        <ThemeToggle />
+        <LoginToggle />
+      </div>
+    </header>
+  );
+}
+
+components/ThemeToggle.js
+'use client'
+import { useTheme } from '@/context/ThemeContext';
+
+export default function ThemeToggle() {
+  const { theme, toggleTheme } = useTheme();
+
+  return (
+    <button
+      onClick={toggleTheme}
+      className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+    >
+      {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+    </button>
+  );
+}
+
+components/LoginToggle.js
+'use client'
+import { useAuth } from '@/context/AuthContext';
+
+export default function LoginToggle() {
+  const { isLoggedIn, login, logout } = useAuth();
+
+  return (
+    <button
+      onClick={isLoggedIn ? logout : login}
+      className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600"
+    >
+      {isLoggedIn ? 'Logout' : 'Login'}
+    </button>
+  );
+}
+
