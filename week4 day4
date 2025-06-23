@@ -1,0 +1,471 @@
+nextjs-performance-demo/
+├── app/
+   ├── layout.tsx         
+   ├── page.tsx           
+   └── globals.css        
+├── components/
+   ├── common/
+     ├── Header.tsx     
+     └── Footer.tsx     
+     ├── HeavyComponent.tsx 
+     ├── ProductCard.tsx    
+     └── ImageGallery.tsx   
+├── utils/
+     └── data.ts            
+└── public/
+     └── images/             
+        ├── example-image-1.jpg 
+        └── example-image-2.jpg
+├── tailwind.config.ts
+├── next.config.mjs
+├── package.json
+└── tsconfig.json
+
+app/globals.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body {
+  font-family: sans-serif;
+  background-color: #1a202c; 
+  color: #edf2f7; 
+}
+
+app/layout.tsx
+import './globals.css';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import Header from '@/components/common/Header';
+import Footer from '@/components/common/Footer';
+
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata: Metadata = {
+  title: 'Performance Optimization Demo',
+  description: 'Next.js, React.memo, useCallback, Dynamic Imports, next/image',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className={`${inter.className} min-h-screen flex flex-col`}>
+        <Header />
+        <main className="flex-grow container mx-auto p-4 sm:p-6 md:p-8">
+          {children}
+        </main>
+        <Footer />
+      </body>
+    </html>
+  );
+}
+
+components/common/Header.tsx
+import Link from 'next/link';
+
+const Header = () => {
+  return (
+    <header className="bg-gray-800 p-4 shadow-md">
+      <div className="container mx-auto flex justify-between items-center">
+        <Link href="/" className="text-xl font-bold text-blue-400 hover:text-blue-300 transition-colors">
+            Performance Demo
+        </Link>
+        <nav>
+          <ul className="flex space-x-4">
+            <li>
+              <Link href="/" className="text-gray-300 hover:text-white transition-colors">
+                  Home
+              </Link>
+            </li>
+            
+          </ul>
+        </nav>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
+
+components/common/Footer.tsx
+const Footer = () => {
+  return (
+    <footer className="bg-gray-800 p-4 mt-8 shadow-inner">
+      <div className="container mx-auto text-center text-gray-400 text-sm">
+        &copy; {new Date().getFullYear()} Performance Demo. All rights reserved.
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
+
+utils/data.ts
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+}
+
+export const products: Product[] = [
+  {
+    id: 1,
+    name: 'Wireless Headphones',
+    description: 'High-fidelity sound with active noise cancellation.',
+    price: 199.99,
+    imageUrl: '/images/example-image-1.jpg',
+  },
+  {
+    id: 2,
+    name: 'Smartwatch Pro',
+    description: 'Track your fitness, heart rate, and notifications.',
+    price: 249.99,
+    imageUrl: '/images/example-image-2.jpg',
+  },
+  {
+    id: 3,
+    name: 'Ergonomic Office Chair',
+    description: 'Designed for comfort and support during long work hours.',
+    price: 349.99,
+    imageUrl: '/images/example-image-1.jpg', // Re-using image for demo
+  },
+  {
+    id: 4,
+    name: '4K Ultra HD Monitor',
+    description: 'Stunning visuals for work and entertainment.',
+    price: 499.99,
+    imageUrl: '/images/example-image-2.jpg', // Re-using image for demo
+  },
+  {
+    id: 5,
+    name: 'Portable SSD 1TB',
+    description: 'Fast and reliable external storage solution.',
+    price: 129.99,
+    imageUrl: '/images/example-image-1.jpg', // Re-using image for demo
+  },
+  {
+    id: 6,
+    name: 'Gaming Keyboard RGB',
+    description: 'Mechanical keys with customizable RGB lighting.',
+    price: 89.99,
+    imageUrl: '/images/example-image-2.jpg', // Re-using image for demo
+  },
+];
+
+components/ImageGallery.tsx
+import Image from 'next/image';
+
+const ImageGallery = () => {
+  return (
+    <section className="mt-8">
+      <h2 className="text-2xl font-semibold mb-4 text-blue-300">
+        1. Optimized Images with `next/image`
+      </h2>
+      <p className="mb-4 text-gray-300">
+        These images are loaded using `next/image`, which handles lazy loading,
+        responsive sizing, and modern formats like WebP automatically.
+        Observe network requests in DevTools.
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="relative w-full h-48 sm:h-64 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out">
+          <Image
+            src="/images/example-image-1.jpg"
+            alt="Scenic view with next/image"
+            layout="fill" 
+            objectFit="cover"
+            quality={75}
+            placeholder="blur" 
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-4 text-white font-semibold">
+            Fill Layout Example
+          </div>
+        </div>
+
+        <div className="relative rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out">
+          
+          <Image
+            src="/images/example-image-2.jpg"
+            alt="Another scenic view with next/image"
+            width={600}
+            height={400}
+            layout="responsive" 
+            objectFit="cover"
+            quality={75}
+            className="rounded-lg" 
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-4 text-white font-semibold">
+            Responsive Layout Example
+          </div>
+        </div>
+
+        <div className="relative rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out">
+          
+          <Image
+            src="/images/example-image-1.jpg"
+            alt="Fixed size image"
+            width={300}
+            height={200}
+            layout="fixed" 
+            quality={75}
+            className="rounded-lg"
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-4 text-white font-semibold">
+            Fixed Layout Example
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default ImageGallery;
+
+components/HeavyComponent.tsx
+import React, { useEffect, useState } from 'react';
+
+const HeavyComponent = () => {
+  const [data, setData] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    
+    const fetchData = async () => {
+      setLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const heavyData = Array.from({ length: 5000 }, (_, i) => `Item ${i + 1} - This is a lot of text to render in a list.`);
+      setData(heavyData);
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="bg-gray-700 p-6 rounded-lg shadow-md animate-pulse">
+        <h3 className="text-xl font-semibold mb-3 text-blue-200">Loading Heavy Content...</h3>
+        <div className="h-4 bg-gray-600 rounded w-3/4 mb-2"></div>
+        <div className="h-4 bg-gray-600 rounded w-1/2"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-gray-700 p-6 rounded-lg shadow-md">
+      <h3 className="text-xl font-semibold mb-4 text-blue-200">
+        Heavy Component Loaded (Simulated Large Data)
+      </h3>
+      <div className="max-h-64 overflow-y-auto border border-gray-600 rounded p-2">
+        <ul className="list-disc list-inside text-gray-300">
+          {data.slice(0, 20).map((item, index) => 
+            <li key={index} className="text-sm">
+              {item}
+            </li>
+          ))}
+          {data.length > 20 && (
+            <li className="text-sm font-semibold text-gray-400">
+              ...and {data.length - 20} more items.
+            </li>
+          )}
+        </ul>
+      </div>
+      <p className="mt-4 text-gray-400 text-sm">
+        This component was loaded lazily to improve initial page load performance.
+      </p>
+    </div>
+  );
+};
+
+export default HeavyComponent;
+
+components/ProductCard.tsx
+import React, { memo, useCallback } from 'react';
+import Image from 'next/image';
+import { Product } from '@/utils/data';
+
+interface ProductCardProps {
+  product: Product;
+  onAddToCart: (productId: number) => void;
+}
+
+
+const AddToCartButton = memo(({ onClick, productId }: { onClick: (id: number) => void; productId: number }) => {
+  console.log(`Rendering AddToCartButton for product ${productId}`);
+  return (
+    <button
+      onClick={() => onClick(productId)}
+      className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200"
+    >
+      Add to Cart
+    </button>
+  );
+});
+AddToCartButton.displayName = 'AddToCartButton'; 
+
+
+const ProductCard = memo(({ product, onAddToCart }: ProductCardProps) => {
+  console.log(`Rendering ProductCard: ${product.name}`);
+  const handleAddToCartClick = useCallback(() => {
+    onAddToCart(product.id);
+  }, [onAddToCart, product.id]);
+
+  return (
+    <div className="bg-gray-700 rounded-lg shadow-xl p-4 flex flex-col transform hover:scale-105 transition-transform duration-300 ease-in-out">
+      <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden">
+        <Image
+          src={product.imageUrl}
+          alt={product.name}
+          layout="fill"
+          objectFit="cover"
+          quality={75}
+          className="rounded-lg"
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+        />
+      </div>
+      <h3 className="text-xl font-semibold mb-2 text-blue-300">{product.name}</h3>
+      <p className="text-gray-300 text-sm flex-grow mb-3">{product.description}</p>
+      <div className="flex justify-between items-center mt-auto">
+        <span className="text-2xl font-bold text-green-400">${product.price.toFixed(2)}</span>
+        <AddToCartButton onClick={handleAddToCartClick} productId={product.id} />
+      </div>
+    </div>
+  );
+});
+ProductCard.displayName = 'ProductCard'; 
+
+export default ProductCard;
+
+app/page.tsx
+'use client'; 
+
+import React, { useState, useCallback, Suspense } from 'react';
+import dynamic from 'next/dynamic';
+import { products } from '@/utils/data';
+import ProductCard from '@/components/ProductCard';
+import ImageGallery from '@/components/ImageGallery';
+
+
+const DynamicHeavyComponent = dynamic(
+  () => import('@/components/HeavyComponent'),
+  {
+    loading: () => (
+      <div className="bg-gray-700 p-6 rounded-lg shadow-md animate-pulse text-center text-blue-300 font-semibold text-lg">
+        Loading heavy section...
+      </div>
+    ),
+    ssr: false, // Ensures this component is only rendered on the client side
+  }
+);
+
+export default function HomePage() {
+  const [showHeavyComponent, setShowHeavyComponent] = useState(false);
+  const [cartItems, setCartItems] = useState<number[]>([]);
+
+ 
+  const handleAddToCart = useCallback((productId: number) => {
+    setCartItems((prevItems) => {
+      if (!prevItems.includes(productId)) {
+        console.log(`Product ${productId} added to cart!`);
+        return [...prevItems, productId];
+      }
+      console.log(`Product ${productId} already in cart.`);
+      return prevItems;
+    });
+  }, []); // Empty dependency array means this function is created once
+
+  const toggleHeavyComponent = () => {
+    setShowHeavyComponent((prev) => !prev);
+  };
+
+  return (
+    <div className="space-y-12">
+      <h1 className="text-4xl font-bold text-center text-white mb-8">
+        Performance Optimization Demo
+      </h1>
+
+      
+      <ImageGallery />
+
+    
+      <section className="mt-8">
+        <h2 className="text-2xl font-semibold mb-4 text-blue-300">
+          2. Dynamic Imports (Lazy Loading)
+        </h2>
+        <p className="mb-4 text-gray-300">
+          The "Heavy Component" below is dynamically imported. It will only load its JavaScript bundle
+          when you click the button to show it. Observe your browser's Network tab.
+        </p>
+        <button
+          onClick={toggleHeavyComponent}
+          className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200"
+        >
+          {showHeavyComponent ? 'Hide' : 'Show'} Heavy Component
+        </button>
+
+        <div className="mt-6 border border-gray-600 p-4 rounded-lg bg-gray-800">
+          {showHeavyComponent && (
+            <Suspense
+              fallback={
+                <div className="text-center text-gray-400 py-8">
+                  Loading dynamic content...
+                </div>
+              }
+            >
+              <DynamicHeavyComponent />
+            </Suspense>
+          )}
+        </div>
+      </section>
+
+      
+      <section className="mt-8">
+        <h2 className="text-2xl font-semibold mb-4 text-blue-300">
+          3. `React.memo` and `useCallback` for Re-render Control
+        </h2>
+        <p className="mb-4 text-gray-300">
+          Product cards below use `React.memo` to prevent re-renders if their props (like `product` data) don't change.
+          The `onAddToCart` function passed to them is wrapped in `useCallback` to ensure its reference
+          doesn't change on every `HomePage` render, thus preventing unnecessary re-renders of memoized `ProductCard`s.
+          Open your browser's console to see "Rendering ProductCard" logs, and observe when they appear.
+        </p>
+
+        <div className="bg-gray-800 p-4 rounded-lg shadow-md mb-6">
+            <h3 className="text-xl font-semibold text-white">
+                Cart Items ({cartItems.length}):{' '}
+                <span className="text-green-400">
+                    {cartItems.length > 0 ? cartItems.join(', ') : 'None'}
+                </span>
+            </h3>
+            <p className="text-sm text-gray-400 mt-2">
+                Changing cart items will cause this parent component to re-render,
+                but `ProductCard`s will only re-render if their specific props change.
+            </p>
+            <button
+                onClick={() => setCartItems([])}
+                className="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-lg text-sm transition-colors duration-200"
+            >
+                Clear Cart
+            </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onAddToCart={handleAddToCart} 
+            />
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
