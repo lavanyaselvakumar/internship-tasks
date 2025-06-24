@@ -1,0 +1,126 @@
+my-next-app/
+├── app/
+│   ├── page.tsx
+│   ├── dashboard/page.tsx
+│   ├── api/auth/[...nextauth]/route.ts
+│   └── layout.tsx
+├── components/
+│   ├── Header.tsx
+│   ├── NewsCard.tsx
+├── lib/
+│   └── auth.ts
+├── store/
+│   └── globalState.ts
+├── public/
+│   └── logo.png
+├── styles/
+│   └── globals.css
+├── .env.local
+├── next.config.js
+├── tailwind.config.js
+├── tsconfig.json
+├── package.json
+
+app/api/auth/[...nextauth]/route.ts
+
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+
+const handler = NextAuth({
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: {},
+        password: {},
+      },
+      async authorize(credentials) {
+        if (
+          credentials?.email === "test@example.com" &&
+          credentials?.password === "123456"
+        ) {
+          return { id: "1", name: "Test User", email: "test@example.com" };
+        }
+        return null;
+      },
+    }),
+  ],
+  pages: {
+    signIn: "/login",
+  },
+});
+
+export { handler as GET, handler as POST };
+
+app/page.tsx
+
+'use client'
+import { useEffect, useState } from "react";
+import NewsCard from "@/components/NewsCard";
+
+export default function HomePage() {
+  const [news, setNews] = useState([]);
+
+  useEffect(() => {
+    fetch(`https://newsapi.org/v2/top-headlines?country=in&apiKey=${process.env.NEXT_PUBLIC_NEWS_API}`)
+      .then(res => res.json())
+      .then(data => setNews(data.articles));
+  }, []);
+
+  return (
+    <div className="p-6 grid gap-4 md:grid-cols-3">
+      {news.map((article, index) => (
+        <NewsCard key={index} article={article} />
+      ))}
+    </div>
+  );
+}
+
+store/globalState.ts
+import { create } from "zustand";
+
+type Store = {
+  theme: "light" | "dark";
+  toggleTheme: () => void;
+};
+
+export const useGlobalStore = create<Store>((set) => ({
+  theme: "light",
+  toggleTheme: () =>
+    set((state) => ({ theme: state.theme === "light" ? "dark" : "light" })),
+}));
+
+components/NewsCard.tsx
+import Image from "next/image";
+
+export default function NewsCard({ article }) {
+  return (
+    <div className="bg-white shadow-lg p-4 rounded-xl">
+      <Image
+        src={article.urlToImage || "/logo.png"}
+        alt={article.title}
+        width={400}
+        height={200}
+        className="rounded-md object-cover"
+      />
+      <h2 className="font-bold text-lg mt-2">{article.title}</h2>
+      <p className="text-sm text-gray-700">{article.description}</p>
+    </div>
+  );
+}
+
+.env.local
+
+NEXTAUTH_SECRET=your_secret_key
+NEXT_PUBLIC_NEWS_API=your_newsapi_key
+
+next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    domains: ['cdn.cnn.com', 'static.toiimg.com'], // example domains
+  },
+};
+
+module.exports = nextConfig;
+
