@@ -1,0 +1,194 @@
+my-app
+├── app
+│   ├── about
+│   │   └── page.tsx
+│   ├── services
+│   │   └── page.tsx
+├── components
+│   ├── AboutBanner.tsx
+│   ├── CompanyIntro.tsx
+│   ├── TeamSection.tsx
+│   ├── ServiceCard.tsx
+│   └── ServicesGrid.tsx
+└── public
+    ├── team.jpg
+    └── office.jpg
+
+app/about/page.tsx
+import AboutBanner from '@/components/AboutBanner'
+import CompanyIntro from '@/components/CompanyIntro'
+import TeamSection from '@/components/TeamSection'
+
+const AboutPage = () => {
+  return (
+    <>
+      <AboutBanner />
+      <CompanyIntro />
+      <TeamSection />
+    </>
+  )
+}
+
+export default AboutPage
+
+components/AboutBanner.tsx
+const AboutBanner = () => {
+  return (
+    <section className="bg-gradient-to-r from-blue-700 to-purple-700 text-white py-16 text-center shadow-md">
+      <h1 className="text-4xl font-bold mb-4">About Our Company</h1>
+      <p className="text-lg max-w-2xl mx-auto">
+        We craft modern, scalable digital solutions to help you grow your business.
+      </p>
+    </section>
+  )
+}
+
+export default AboutBanner
+
+components/CompanyIntro.tsx
+import Image from 'next/image'
+
+const CompanyIntro = () => {
+  return (
+    <section className="py-16 bg-white px-4 lg:px-0">
+      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12">
+        <div className="w-full lg:w-1/2">
+          <Image
+            src="/office.jpg"
+            alt="Office"
+            width={600}
+            height={400}
+            className="rounded-lg shadow-md"
+          />
+        </div>
+        <div className="w-full lg:w-1/2">
+          <h2 className="text-3xl font-semibold mb-4">Who We Are</h2>
+          <p className="text-gray-700 mb-4 leading-relaxed">
+            Founded in 2021, our company has been helping startups and businesses build scalable and modern digital products. We specialize in web development using cutting-edge technologies like Next.js and Tailwind CSS.
+          </p>
+          <p className="text-gray-700 leading-relaxed">
+            Our team is passionate, experienced, and focused on delivering results that matter. We believe in innovation, collaboration, and transparency.
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default CompanyIntro
+
+components/TeamSection.tsx
+const values = [
+  {
+    title: 'Integrity',
+    description: 'We value honesty and accountability in every project we take on.',
+  },
+  {
+    title: 'Innovation',
+    description: 'We are committed to staying ahead with modern tools and methods.',
+  },
+  {
+    title: 'Customer First',
+    description: 'Your satisfaction is our top priority throughout the development journey.',
+  },
+]
+
+const TeamSection = () => {
+  return (
+    <section className="py-20 bg-gray-100">
+      <div className="max-w-5xl mx-auto text-center">
+        <h3 className="text-3xl font-bold mb-10">Our Core Values</h3>
+        <div className="grid md:grid-cols-3 gap-10">
+          {values.map((val) => (
+            <div key={val.title} className="bg-white shadow-lg p-6 rounded-lg">
+              <h4 className="text-xl font-semibold mb-2">{val.title}</h4>
+              <p className="text-gray-600">{val.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default TeamSection
+
+app/services/page.tsx
+import ServicesGrid from '@/components/ServicesGrid'
+
+const ServicesPage = () => {
+  return (
+    <div>
+      <section className="bg-blue-100 py-16 text-center">
+        <h1 className="text-4xl font-bold">Our Services</h1>
+        <p className="text-gray-700 mt-4 max-w-xl mx-auto">
+          Explore our offerings designed to empower your business digitally.
+        </p>
+      </section>
+      <ServicesGrid />
+    </div>
+  )
+}
+
+export default ServicesPage
+
+components/ServiceCard.tsx
+type ServiceProps = {
+  title: string
+  description: string
+  icon?: React.ReactNode
+}
+
+const ServiceCard = ({ title, description, icon }: ServiceProps) => {
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition">
+      <div className="text-4xl text-blue-500 mb-4">{icon}</div>
+      <h3 className="text-xl font-bold mb-2">{title}</h3>
+      <p className="text-gray-600">{description}</p>
+    </div>
+  )
+}
+
+export default ServiceCard
+
+components/ServicesGrid.tsx
+import ServiceCard from './ServiceCard'
+import { Code, Palette, TrendingUp } from 'lucide-react'
+
+const services = [
+  {
+    title: 'Web Development',
+    description: 'Custom-built websites with modern technologies like React and Next.js.',
+    icon: <Code />,
+  },
+  {
+    title: 'UI/UX Design',
+    description: 'User-focused design with beautiful and intuitive interfaces.',
+    icon: <Palette />,
+  },
+  {
+    title: 'SEO & Marketing',
+    description: 'Improve your site visibility and reach the right audience.',
+    icon: <TrendingUp />,
+  },
+]
+
+const ServicesGrid = () => {
+  return (
+    <section className="py-20 bg-white px-4">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-10">
+        {services.map((service) => (
+          <ServiceCard
+            key={service.title}
+            title={service.title}
+            description={service.description}
+            icon={service.icon}
+          />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+export default ServicesGrid
+
