@@ -1,0 +1,220 @@
+my-app
+── app
+  ├── layout.tsx
+  ├── page.tsx
+  ├── about
+  └── page.tsx
+├── contact
+   └── page.tsx
+├── components
+   ├── Navbar.tsx
+   ├── Footer.tsx
+   ├── MainLayout.tsx
+   ├── Hero.tsx
+   ├── Services.tsx
+   └── CTA.tsx
+
+app/layout.tsx
+import './globals.css'
+import { ReactNode } from 'react'
+import MainLayout from '@/components/MainLayout'
+
+export const metadata = {
+  title: 'My Next App',
+  description: 'Professional Website Built with Next.js and Tailwind CSS',
+}
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <MainLayout>
+          {children}
+        </MainLayout>
+      </body>
+    </html>
+  )
+}
+
+components/MainLayout.tsx
+'use client'
+import { ReactNode } from 'react'
+import Navbar from './Navbar'
+import Footer from './Footer'
+
+const MainLayout = ({ children }: { children: ReactNode }) => {
+  return (
+    <div className="flex flex-col min-h-screen bg-white text-gray-900">
+      <Navbar />
+      <main className="flex-grow container mx-auto px-4 py-6">
+        {children}
+      </main>
+      <Footer />
+    </div>
+  )
+}
+
+export default MainLayout
+
+components/Navbar.tsx
+'use client'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+
+const Navbar = () => {
+  const pathname = usePathname()
+
+  const navItems = [
+    { name: 'Home', href: '/' },
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' },
+  ]
+
+  return (
+    <header className="bg-blue-600 text-white shadow-md">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 className="text-xl font-bold">MyWebsite</h1>
+        <nav>
+          <ul className="flex gap-6 text-sm">
+            {navItems.map(({ name, href }) => (
+              <li key={name}>
+                <Link
+                  href={href}
+                  className={`hover:text-yellow-300 ${
+                    pathname === href ? 'underline text-yellow-300' : ''
+                  }`}
+                >
+                  {name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </header>
+  )
+}
+
+export default Navbar
+
+components/Footer.tsx
+const Footer = () => {
+  return (
+    <footer className="bg-gray-800 text-white text-center py-6">
+      <p className="mb-2">© {new Date().getFullYear()} MyWebsite. All rights reserved.</p>
+      <p className="text-sm">Built with using Next.js & Tailwind CSS</p>
+    </footer>
+  )
+}
+
+export default Footer
+
+app/page.tsx
+import Hero from '@/components/Hero'
+import Services from '@/components/Services'
+import CTA from '@/components/CTA'
+
+const HomePage = () => {
+  return (
+    <>
+      <Hero />
+      <Services />
+      <CTA />
+    </>
+  )
+}
+
+export default HomePage
+
+components/Hero.tsx
+const Hero = () => {
+  return (
+    <section className="py-20 bg-blue-100 text-center rounded-lg shadow-lg mb-10">
+      <h2 className="text-4xl font-bold mb-4">Welcome to My Website</h2>
+      <p className="text-lg mb-6 max-w-xl mx-auto">
+        This is a modern Next.js website built with Tailwind CSS. Discover our services and let’s build something great together!
+      </p>
+      <button className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+        Get Started
+      </button>
+    </section>
+  )
+}
+
+export default Hero
+
+components/Services.tsx
+const services = [
+  { title: 'Web Development', description: 'Modern, responsive web applications using Next.js.' },
+  { title: 'UI/UX Design', description: 'Beautiful and intuitive user experiences with Tailwind CSS.' },
+  { title: 'SEO Optimization', description: 'Improve your visibility and reach more users organically.' },
+]
+
+const Services = () => {
+  return (
+    <section className="py-16">
+      <h3 className="text-3xl font-semibold text-center mb-12">Our Services</h3>
+      <div className="grid md:grid-cols-3 gap-8">
+        {services.map((service) => (
+          <div
+            key={service.title}
+            className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl transition"
+          >
+            <h4 className="text-xl font-bold mb-2">{service.title}</h4>
+            <p className="text-gray-600">{service.description}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+export default Services
+
+components/CTA.tsx
+import Link from 'next/link'
+
+const CTA = () => {
+  return (
+    <section className="py-20 bg-yellow-100 text-center rounded-lg shadow-lg mt-10">
+      <h3 className="text-3xl font-semibold mb-4">Ready to work with us?</h3>
+      <p className="mb-6 text-lg">Let’s build something amazing together. Reach out now!</p>
+      <Link href="/contact">
+        <button className="bg-yellow-500 text-white px-6 py-2 rounded hover:bg-yellow-600">
+          Contact Us
+        </button>
+      </Link>
+    </section>
+  )
+}
+
+export default CTA
+
+app/about/page.tsx
+const AboutPage = () => {
+  return (
+    <section className="max-w-3xl mx-auto py-16">
+      <h2 className="text-3xl font-bold mb-6">About Us</h2>
+      <p className="text-gray-700 leading-relaxed">
+        We are a passionate team building modern web solutions. Our goal is to deliver clean, performant, and user-friendly interfaces using the latest tech like Next.js and Tailwind CSS.
+      </p>
+    </section>
+  )
+}
+
+export default AboutPage
+
+app/contact/page.tsx
+const ContactPage = () => {
+  return (
+    <section className="max-w-3xl mx-auto py-16">
+      <h2 className="text-3xl font-bold mb-6">Contact Us</h2>
+      <p className="mb-4">Email: contact@mywebsite.com</p>
+      <p className="mb-4">Phone: +91 98765 43210</p>
+      <p>Location: Chennai, Tamil Nadu</p>
+    </section>
+  )
+}
+
+export default ContactPage
+
