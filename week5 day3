@@ -1,0 +1,307 @@
+my-project-site/
+├── public
+│   ├── images
+│   │   ├── products
+│   │   │   └── product1.jpg
+│   │   │   └── product2.jpg
+│   │   │   └── product3.jpg
+│   │   │   └── product4.jpg
+│   │   ├── projects
+│   │   │   └── project1.jpg
+│   │   │   └── project2.jpg
+├── src
+│   ├── app
+│   │   ├── products
+│   │   │   ├── page.tsx    
+│   │   │   └── [slug]/     
+│   │   │       └── page.tsx
+│   │   ├── projects
+│   │   │   ├── page.tsx    
+│   │   │   └── [slug]/    
+│   │   │       └── page.tsx
+│   ├── components/
+│   │   ├── ProductCard.tsx 
+│   │   └── ProjectCard.tsx
+│   ├── lib/
+│   │   └── data.ts         
+
+src/lib/data.ts
+import { Product, Project } from './types'; 
+
+export const products: Product[] = [
+  {
+    id: 'p1',
+    name: 'Elegant Desk Lamp',
+    description: 'A modern desk lamp with adjustable brightness, perfect for home offices.',
+    imageUrl: '/images/products/product1.jpg',
+    category: 'Lighting',
+  },
+  {
+    id: 'p2',
+    name: 'Smartwatch Pro',
+    description: 'Track your fitness, receive notifications, and stay connected on the go.',
+    imageUrl: '/images/products/product2.jpg',
+    category: 'Electronics',
+  },
+  {
+    id: 'p3',
+    name: 'Ergonomic Office Chair',
+    description: 'Designed for comfort and support during long working hours.',
+    imageUrl: '/images/products/product3.jpg',
+    category: 'Furniture',
+  },
+  {
+    id: 'p4',
+    name: 'Wireless Bluetooth Headphones',
+    description: 'Immersive sound experience with noise cancellation and long battery life.',
+    imageUrl: '/images/products/product4.jpg',
+    category: 'Electronics',
+  },
+  
+];
+
+export const projects: Project[] = [
+  {
+    id: 'proj1',
+    title: 'E-commerce Redesign',
+    description: 'Complete UI/UX overhaul and frontend implementation for an online retail platform.',
+    imageUrl: '/images/projects/project1.jpg',
+    details: 'This project involved extensive user research, wireframing, prototyping, and developing a responsive e-commerce storefront using React and Next.js. Key features include a product catalog, shopping cart, and secure checkout process. The goal was to improve user engagement and conversion rates.',
+    link: 'https://example.com/ecommerce-redesign'
+  },
+  {
+    id: 'proj2',
+    title: 'Mobile App for Fitness',
+    description: 'Developed a cross-platform mobile application to track workouts and nutrition.',
+    imageUrl: '/images/projects/project2.jpg',
+    details: 'Built with React Native, this application provides users with personalized workout plans, calorie tracking, and progress visualization. Integrations with health APIs were also explored. Focus was on intuitive UI and performance.',
+    link: 'https://example.com/fitness-app'
+  },
+  
+];
+
+src/components/ProductCard.tsx
+import Image from 'next/image';
+import { Product } from '@/lib/types'; 
+import Button from '@/components/ui/Button'; 
+
+interface ProductCardProps {
+  product: Product;
+}
+
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  return (
+    <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col h-full">
+      <div className="relative w-full h-48 bg-gray-700 flex items-center justify-center overflow-hidden">
+        <Image
+          src={product.imageUrl}
+          alt={product.name}
+          fill
+          style={{ objectFit: 'cover' }}
+          className="transition-transform duration-300 hover:scale-105"
+        />
+      </div>
+      <div className="p-5 flex flex-col flex-grow">
+        <h3 className="text-xl font-semibold text-white mb-2">{product.name}</h3>
+        <p className="text-gray-300 text-sm mb-4 flex-grow">{product.description}</p>
+        <div className="text-gray-400 text-xs mb-4">Category: {product.category}</div>
+        <Button variant="secondary" className="mt-auto w-full">
+          View Details
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default ProductCard;
+
+src/app/products/page.tsx
+'use client'; 
+import { Metadata } from 'next'; 
+import ProductCard from '@/components/ProductCard';
+import PageHeader from '@/components/PageHeader';
+import Input from '@/components/ui/Input'; 
+import { products } from '@/lib/data'; 
+import { useState } from 'react';
+export const metadata: Metadata = {
+  title: 'Products',
+  description: 'Explore a range of products showcasing my front-end development skills.',
+};
+
+export default function ProductsPage() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+
+  
+  const categories = ['All', ...new Set(products.map(p => p.category))];
+
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <PageHeader
+        title="Our Products"
+        subtitle="Discover a collection of items that demonstrate various UI components and design patterns."
+      />
+
+      
+      <div className="mb-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <Input
+          type="text"
+          placeholder="Search products..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full sm:w-1/2 max-w-sm"
+        />
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="w-full sm:w-auto p-2 border rounded-md border-gray-700 bg-gray-800 text-gray-100 focus:ring-primary focus:border-primary"
+        >
+          {categories.map(category => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      
+      {filteredProducts.length === 0 ? (
+        <p className="text-center text-gray-400 text-lg">No products found matching your criteria.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {filteredProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+src/components/ProjectCard.tsx
+import Image from 'next/image';
+import { Project } from '@/lib/types'; 
+import Button from '@/components/ui/Button'; 
+
+interface ProjectCardProps {
+  project: Project;
+  onViewDetails: (project: Project) => void; // Callback for opening modal
+}
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, onViewDetails }) => {
+  return (
+    <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col h-full">
+      <div className="relative w-full h-48 bg-gray-700 flex items-center justify-center overflow-hidden">
+        <Image
+          src={project.imageUrl}
+          alt={project.title}
+          fill
+          style={{ objectFit: 'cover' }}
+          className="transition-transform duration-300 hover:scale-105"
+        />
+      </div>
+      <div className="p-5 flex flex-col flex-grow">
+        <h3 className="text-xl font-semibold text-white mb-2">{project.title}</h3>
+        <p className="text-gray-300 text-sm mb-4 flex-grow">{project.description}</p>
+        <Button onClick={() => onViewDetails(project)} className="mt-auto w-full">
+          Learn More
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default ProjectCard;
+
+src/app/projects/page.tsx
+'use client';
+import { Metadata } from 'next'; 
+import ProjectCard from '@/components/ProjectCard';
+import PageHeader from '@/components/PageHeader';
+import Modal from '@/components/ui/Modal'; 
+import { projects } from '@/lib/data'; 
+import { useState } from 'react';
+import { Project } from '@/lib/types'; 
+export const metadata: Metadata = {
+  title: 'Projects',
+  description: 'Showcasing my recent web development projects and case studies.',
+};
+
+export default function ProjectsPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  const handleViewDetails = (project: Project) => {
+    setSelectedProject(project);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProject(null);
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <PageHeader
+        title="My Projects"
+        subtitle="Explore a selection of my recent work, highlighting my skills in various web technologies."
+      />
+
+      {/* Projects Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {projects.map((project) => (
+          <ProjectCard key={project.id} project={project} onViewDetails={handleViewDetails} />
+        ))}
+      </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        title={selectedProject?.title || 'Project Details'}
+      >
+        {selectedProject && (
+          <div className="space-y-4">
+            {selectedProject.imageUrl && (
+              <div className="relative w-full h-56 rounded-md overflow-hidden mb-4">
+                
+                <img
+                  src={selectedProject.imageUrl}
+                  alt={selectedProject.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            <p className="text-gray-200">{selectedProject.description}</p>
+            {selectedProject.details && (
+              <>
+                <h4 className="font-semibold text-gray-100 mt-4">Detailed Description:</h4>
+                <p className="text-gray-300">{selectedProject.details}</p>
+              </>
+            )}
+            {selectedProject.link && (
+              <p className="text-sm">
+                <a
+                  href={selectedProject.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  View Live Project →
+                </a>
+              </p>
+            )}
+          </div>
+        )}
+      </Modal>
+    </div>
+  );
+}
+
